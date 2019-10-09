@@ -16,18 +16,11 @@ PRINSEQ_VERSION=0.20.4
 NXTRIM_VERSION=0.4.3
 FILTERSPADES_VERSION=0.1
 PRODIGAL_VERSION=2.6.2
-SPADES_VERSION=3.12.0
+SPADES_VERSION=3.13.0
 PPLACER_VERSION=1.1.alpha17
 HMMER_VERSION=3.2
 CHECKM_DATA_VERSION=2015_01_16
 
-
-#TRANSCRIPT DE
-STAR_VERSION=2.6.0a
-CUFFLINKS_VERSION=2.2.1
-SALMON_VERSION=0.11.3
-KALLISTO_VERSION=0.44.0
-SAILFISH_VERSION=0.10.0
 
 #ASSEMBLY_tools_download_url
 FASTQC_DOWNLOAD_URL="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v${FASTQC_VERSION}.zip"
@@ -43,12 +36,6 @@ HMMER_DOWNLOAD_URL="http://eddylab.org/software/hmmer/hmmer-${HMMER_VERSION}.tar
 CHECKM_DATA_DOWNLOAD_URL="https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_${CHECKM_DATA_VERSION}.tar.gz"
 
 #transcript_DE_tools_download_url
-STAR_DOWNLOAD_URL="https://github.com/alexdobin/STAR/archive/${STAR_VERSION}.tar.gz"
-CUFFLINKS_DOWNLOAD_URL="http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-${CUFFLINKS_VERSION}.Linux_x86_64.tar.gz"
-SALMON_DOWNLOAD_URL="https://github.com/COMBINE-lab/salmon/releases/download/v${SALMON_VERSION}/salmon-${SALMON_VERSION}-linux_x86_64.tar.gz"
-KALLISTO_DOWNLOAD_URL="https://github.com/pachterlab/kallisto/releases/download/v${KALLISTO_VERSION}/kallisto_linux-v${KALLISTO_VERSION}.tar.gz"
-SAILFISH_DOWNLOAD_URL="https://github.com/kingsfordgroup/sailfish/releases/download/v${SAILFISH_VERSION}/SailfishBeta-${SAILFISH_VERSION}_CentOS5.tar.gz"
-
 
 #-----------------Checking dependancies, pre installed tools--------------------------
 #----minal dependancies------
@@ -66,7 +53,7 @@ done
 
 
 #----packages from pip-------
-declare -a piplist=("pip" "nanofilt" "luigi" "numpy" "scipy" "matplotlib" "pysam" "dendropy" "checkm" "HTSeq")
+declare -a piplist=("pip" "nanofilt" "luigi" "numpy" "scipy" "matplotlib" "dendropy" "checkm" )
 
 for package in "${piplist[@]}"
     do
@@ -127,45 +114,6 @@ else
     echo -e "\e[1;31m fastp not in PATH \e[0m"
 fi
 
-#.....STAR.........
-if which STAR >/dev/null; 
-    then
-    echo -e "\e[1;36m STAR ...OK \e[0m";
-else
-    echo -e "\e[1;31m STAR not in PATH \e[0m"
-fi
-
-#.....cufflinks.........
-if which cufflinks >/dev/null; 
-    then
-    echo -e "\e[1;36m cufflinks ...OK \e[0m";
-else
-    echo -e "\e[1;31m cufflinks not in PATH \e[0m"
-fi
-
-#.....salmon.........
-if which salmon >/dev/null; 
-    then
-    echo -e "\e[1;36m salmon ...OK \e[0m";
-else
-    echo -e "\e[1;31m salmon not in PATH \e[0m"
-fi
-
-#.....kallisto.........
-if which kallisto >/dev/null; 
-    then
-    echo -e "\e[1;36m kallisto ...OK \e[0m";
-else
-    echo -e "\e[1;31m kallisto not in PATH \e[0m"
-fi
-
-#.....sailfish.........
-if which sailfish >/dev/null; 
-    then
-    echo -e "\e[1;36m sailfish ...OK \e[0m";
-else
-    echo -e "\e[1;31m sailfish not in PATH \e[0m"
-fi
 
 #####
 
@@ -238,7 +186,7 @@ done
 
 # ------------------------Check and install tools from pip --------------------------------
 
-declare -a piplist=("pip" "nanofilt" "luigi" "numpy" "scipy" "matplotlib" "pysam" "dendropy" "HTSeq")
+declare -a piplist=("pip" "nanofilt" "luigi" "numpy" "scipy" "matplotlib" "pysam" "dendropy")
 
 for package in "${piplist[@]}"
 do
@@ -360,16 +308,6 @@ else
        chmod 755 fastp
 fi
 
-# -----------------------------hmmer ------------------------------------------------
-#download $HMMER_DOWNLOAD_URL $build_dir/"hmmer-${HMMER_VERSION}.tar.gz"
-#cd $build_dir
-#tar -xvzf "hmmer-${HMMER_VERSION}.tar.gz"
-#hmmer_inst="$build_dir/hmmer-${HMMER_VERSION}"
-#cd $hmmer_inst
-#./configure
-#make
-#hmmer_dir="$hmmer_inst/src"
-
 # ----------------------------CheckData --------------------------------------------
 if [ $(checkm lineage_wf 2>/dev/null | grep -c "CheckM cannot run without a valid data folder") -eq 1 ];
 then
@@ -386,79 +324,14 @@ then
         tar -xvzf "checkm_data_${CHECKM_DATA_VERSION}.tar.gz" &> /dev/null
         echo -e "\e[1;31m Setting CheckM data directory to $checkm_data_dir\e[0m"
         sudo checkm data setRoot $checkm_data_dir
-else 
+else
     echo -e "\e[1;36m CheckM Data already downloaded and data root already set \e[0m"
 
 fi
 
 
-
-#-------------------------STAR Aligner----------------------------------------------
-if which STAR >/dev/null; then
-    echo -e "STAR ....installed";
-
-else
-    cd $build_dir
-    download $STAR_DOWNLOAD_URL "STAR-${STAR_VERSION}-Linux.tar.gz"
-    star_dir="$build_dir/STAR-${STAR_VERSION}/bin/Linux_x86_64"
-    tar -xvzf STAR-${STAR_VERSION}-Linux.tar.gz &> /dev/null
-
-fi
-
-
-#-------------------------Cufflinks----------------------------------------------
-if which STAR >/dev/null; then
-    echo -e "cufflink ....installed";
-
-else
-    cd $build_dir
-    download $CUFFLINKS_DOWNLOAD_URL "cufflinks-${CUFFLINKS_VERSION}.Linux_x86_64.tar.gz"
-    cufflinks_dir="$build_dir/cufflinks-${CUFFLINKS_VERSION}.Linux_x86_64"
-    tar -xvzf cufflinks-${CUFFLINKS_VERSION}.Linux_x86_64.tar.gz &> /dev/null
-
-fi
-
-#-------------------------salmon----------------------------------------------
-if which salmon >/dev/null; then
-    echo -e "salmon ....installed";
-
-else
-    cd $build_dir
-    download $SALMON_DOWNLOAD_URL "salmon-${SALMON_VERSION}-linux_x86_64.tar.gz"
-    salmon_dir="$build_dir/salmon-${SALMON_VERSION}-linux_x86_64/bin"
-    tar -xvzf salmon-${SALMON_VERSION}-linux_x86_64.tar.gz &> /dev/null
-
-fi
-
-#-------------------------kallisto----------------------------------------------
-if which kallisto >/dev/null; then
-    echo -e "kallisto ....installed";
-
-else
-    cd $build_dir
-    download $KALLISTO_DOWNLOAD_URL "kallisto_linux-v${KALLISTO_VERSION}.tar.gz"
-    kallisto_dir="$build_dir/kallisto_linux-v${KALLISTO_VERSION}"
-    tar -xvzf kallisto_linux-v${KALLISTO_VERSION}.tar.gz &> /dev/null
-
-fi
-
-#-------------------------sailfish----------------------------------------------
-if which sailfish >/dev/null; then
-    echo -e "salifish ....installed";
-
-else
-    cd $build_dir
-    download $SAILFISH_DOWNLOAD_URL "SailfishBeta-${SAILFISH_VERSION}_CentOS5.tar.gz"
-    sailfish_dir="$build_dir/SailfishBeta-${SAILFISH_VERSION}_CentOS5/bin"
-    sailfish_lib="$build_dir/SailfishBeta-${SAILFISH_VERSION}_CentOS5/lib"
-    tar -xvzf SailfishBeta-${SAILFISH_VERSION}_CentOS5.tar.gz &> /dev/null
-    echo '#Added by CGPipe Installer' >> ~/.bashrc
-    echo 'export LD_LIBRARY_PATH='$sailfish_lib >> ~/.bashrc
-
-fi
-
 #-----------------------------UPDATE PATH-------------------------------------------
-echo '# Added by CGPipe Installer' >> ~/.bashrc
+echo '# Added by BGAPipe Installer' >> ~/.bashrc
 cd $build_dir
 update_path ()
 {
@@ -481,11 +354,7 @@ update_path ${spades_dir}
 update_path ${filterspades_dir}
 update_path ${pplacer_dir}
 update_path ${prodigal_dir}
-update_path ${star_dir}
-update_path ${cufflinks_dir}
-update_path ${salmon_dir}
-update_path ${kallisto_dir}
-update_path ${sailfish_dir}
+
 #--------------------------SOURCE .bashrc-------------------------------------------
 
 echo 'BGAPipe external tools installed at' $start_dir
